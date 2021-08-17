@@ -1,6 +1,6 @@
 const { TwilioClientCommand } = require('@twilio/cli-core').baseCommands;
 const { TwilioCliError } = require('@twilio/cli-core').services.error;
-const { flags } = require("@oclif/command");
+const { flags } = require('@oclif/command');
 
 const { addInfra } = require('../../infra');
 
@@ -19,11 +19,13 @@ class InfraDeploy extends TwilioClientCommand {
         `The current stack is already deployed to ${deployment}. Please switch to that profile or define a new environment`
       );
     }
+
     let command = ['up'];
-    if (this.flags.yes) {
+    if (this.flags['non-interactive']) {
       command.push("--yes");
     }
     runPulumiCommand(command, true, this.twilioClient);
+
     try {
       // Store account SID of the project used for deployment
       addInfra(this.twilioClient.accountSid, getPulumiStack(), true);
@@ -35,12 +37,12 @@ class InfraDeploy extends TwilioClientCommand {
 
 InfraDeploy.flags = Object.assign(
   {
-    yes: flags.boolean({
-      char: 'y',
-      description: 'Passes through the --yes option to pulumi. Deploys without interactive confirmation.'
+    'non-interactive': flags.boolean({
+      char: 'n',
+      description: 'Deploys without interactive confirmation.',
     })
   },
-  TwilioClientCommand.flags
+  TwilioClientCommand.flags,
 );
 
 InfraDeploy.description =
